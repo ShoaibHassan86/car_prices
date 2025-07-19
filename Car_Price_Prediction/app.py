@@ -2,20 +2,23 @@ import streamlit as st
 import pandas as pd
 import pickle
 import datetime
+import os
 
+# === Load model safely ===
+model_path = os.path.join(os.path.dirname(__file__), 'car.sav')
+model = pickle.load(open(model_path, 'rb'))
+
+# === Load CSS ===
 def load_local_css(file_name):
-    with open(file_name, "r") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    try:
+        with open(file_name, "r") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.warning("⚠️ style.css not found. Default styling applied.")
 
-
-model = pickle.load(open('car.sav', 'rb'))
-# Call it
 load_local_css("style.css")
 
-
-
-
-# Brand map
+# === Brand encoding map ===
 brand_map = {
     'Maruti': 1, 'Skoda': 2, 'Honda': 3, 'Hyundai': 4, 'Toyota': 5,
     'Ford': 6, 'Renault': 7, 'Mahindra': 8, 'Tata': 9, 'Chevrolet': 10,
@@ -26,13 +29,11 @@ brand_map = {
     'Opel': 31, 'Peugeot': 32
 }
 
-# Streamlit config
-#st.set_page_config(page_title="Car Price Predictor", page_icon="🚗", layout="centered")
-
+# === Page UI ===
 st.markdown("<h1 style='text-align: center; color: darkblue;'>🚗 Car Price Predictor</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# Input form
+# === Input Section ===
 st.markdown("### 🔧 Enter Car Details:")
 col1, col2 = st.columns(2)
 
@@ -43,14 +44,14 @@ with col1:
     transmission = st.radio("Transmission", ['Manual', 'Automatic'])
 
 with col2:
-    km_driven = st.slider("KM Driven", min_value=0, max_value=300000, value=30000, step=1000)
-    engine = st.slider("Engine Size (cc)", min_value=500, max_value=5000, value=1200, step=100)
-    max_power = st.slider("Max Power (bhp)", min_value=20, max_value=500, value=100, step=5)
-    torque = st.slider("Torque (Nm)", min_value=10, max_value=600, value=150, step=5)
-    mileage = st.slider("Mileage (km/l)", min_value=0.0, max_value=40.0, value=15.0, step=0.1)
-    year = st.slider("Manufacturing Year", min_value=2000, max_value=datetime.datetime.now().year, value=2018)
+    km_driven = st.slider("KM Driven", 0, 300000, 30000, step=1000)
+    engine = st.slider("Engine Size (cc)", 500, 5000, 1200, step=100)
+    max_power = st.slider("Max Power (bhp)", 20, 500, 100, step=5)
+    torque = st.slider("Torque (Nm)", 10, 600, 150, step=5)
+    mileage = st.slider("Mileage (km/l)", 0.0, 40.0, 15.0, step=0.1)
+    year = st.slider("Manufacturing Year", 2000, datetime.datetime.now().year, 2018)
 
-# Prediction logic
+# === Prediction Logic ===
 if st.button("🔍 Predict Price"):
     brand_code = brand_map[brand]
     fuel_code = {'Petrol': 0, 'Diesel': 1, 'Electric': 2, 'Hybrid': 3}[fuel]
@@ -69,6 +70,9 @@ if st.button("🔍 Predict Price"):
         'Brand_Code': [brand_code]
     })
 
-    predicted_price = model.predict(input_df)[0]
-    st.success(f"💰 **Predicted Selling Price**: ₹ {predicted_price:,.2f}")
-    st.balloons()
+    try:
+        predicted_price = model.predict(input_df)[0]
+        st.success(f"💰 **Predicted Selling Price**: ₹ {predicted_price:,.2f}")
+        st.balloons()
+    except Exception as e:
+        st.error(f"❌ Prediction failed: {e}")
