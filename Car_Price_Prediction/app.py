@@ -51,6 +51,7 @@ with col2:
     km_driven = st.slider("KM Driven", 0, 300000, 30000, step=1000)
     engine = st.slider("Engine Size (cc)", 500, 5000, 1200, step=100)
     max_power = st.slider("Max Power (bhp)", 20, 500, 100, step=5)
+    torque = st.slider("Torque (Nm)", 10, 600, 150, step=5)
     mileage = st.slider("Mileage (km/l)", 0.0, 40.0, 15.0, step=0.1)
     year = st.slider("Manufacturing Year", 2000, datetime.datetime.now().year, 2018)
 
@@ -68,6 +69,7 @@ if st.button("🔍 Predict Price"):
         'mileage': [mileage],
         'engine': [engine],
         'max_power': [max_power],
+        'torque': [torque],
         'seats': [seats],
         'Brand_Code': [brand_code]
     })
