@@ -17,7 +17,10 @@ model_path = os.path.join(os.path.dirname(__file__), 'car.sav')
 model = pickle.load(open(model_path, 'rb'))
 
 
-load_local_css("style.css")
+style_path = os.path.join(os.path.dirname(__file__), "style.css")
+st.write("🔍 Loading from:", style_path)
+load_local_css(style_path)
+
 
 # === Brand encoding map ===
 brand_map = {
