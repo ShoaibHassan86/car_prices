@@ -18,7 +18,6 @@ model = pickle.load(open(model_path, 'rb'))
 
 
 load_local_css("style.css")
-st.write("📂 Current Directory Files:", os.listdir())
 
 # === Brand encoding map ===
 brand_map = {
