@@ -4,6 +4,14 @@ import pickle
 import datetime
 import os
 
+def load_local_css(file_name):
+    try:
+        with open(file_name, "r") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.warning("⚠️ style.css not found. Default styling applied.")
+
+
 # === Load model safely ===
 model_path = os.path.join(os.path.dirname(__file__), 'car.sav')
 model = pickle.load(open(model_path, 'rb'))
